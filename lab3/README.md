@@ -1,5 +1,11 @@
 # Отчет по лабораторной работе №3
 
+# Содержание:
+
+[Часть 1: Поднимаем Postgres](#часть-1-поднимаем-postgres)
+[Часть 2: Проверяем репликацию](#часть-2-проверяем-репликацию)
+[Часть 3: Делаем высокую доступность](#часть-3-делаем-высокую-доступность)
+
  ## Часть 1: Поднимаем Postgres
 
 1. Подготавливаем Dockerfile для нашего постгреса. 
@@ -54,3 +60,47 @@
    Редактирование Dockerfile приведет к пересборке образа при перезапуске композ-проекта. Docker Compose обнаружит изменения в Dockerfile и запустит процесс сборки заново.
    
    </details><br>
+
+## Часть 2: Проверяем репликацию
+
+Настройка `pgadmin`
+
+```yml
+pgadmin:
+  image: dpage/pgadmin4
+  container_name: pgadmin
+  environment:
+    PGADMIN_DEFAULT_EMAIL: admin@admin.com
+    PGADMIN_DEFAULT_PASSWORD: admin
+  ports:
+    - "5050:80"
+```
+
+Создание новой таблицы в `pg-master`
+
+```sql
+CREATE TABLE my_first_replication (
+    id int,
+    my_data varchar,
+    my_comment varchar
+);
+
+INSERT INTO my_first_replication VALUES (
+    '1',
+    'my important data',
+    'is this line replicated?'
+);
+
+```
+
+Фиксируем успешную репликацию в `pg-slave`
+
+![pg-slave-replication](screenshots/5.png)
+
+Тестируем редактирование из `pg-slave`
+
+![pg-slave-update-failed](screenshots/6.png)
+
+ ## Часть 3: Делаем высокую доступность
+
+ 
